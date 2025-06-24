@@ -1,6 +1,7 @@
 import express from 'express';
 import routes from './routes';
 import mongoose from 'mongoose';
+require('dotenv').config();
 
 
 class App{
