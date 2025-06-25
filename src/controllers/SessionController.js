@@ -18,11 +18,11 @@ class SessionController{
     }
 
     try {
-      // const existingUser = await User.findOne({ email });
+      const existingUser = await User.findOne({ email });
 
-      // if (existingUser) {
-      //   throw new ConflictError('Email já cadastrado. Por favor, utilize outro email.');
-      // }
+      if (existingUser) {
+        throw new ConflictError('Email já cadastrado. Por favor, utilize outro email.');
+      }
 
       const hashedPassword = await generateHash(password);
 
@@ -58,10 +58,54 @@ class SessionController{
   }
 
   //show: Lista pelo Id
+  async showById(req, res){
+    try {
+      const {user_id} = req.params;
+      
+      const userForFind = await User.findById(user_id);
+      
+      return res.json(userForFind);
+    } catch (error) {
+      console.error('Erro inesperado:', error);
+      const internalError = new InternalServerError();
+      return res.status(internalError.statusCode).json({
+        error: internalError.message,
+        status: internalError.status,
+      });
+    }
+  }
 
   //update: Atualiza sessão
 
   //destroy: Deleta sessão
+  async destroyUserById(req, res){
+    try {
+      const {user_id} = req.headers;
+      const user = await User.findById(user_id);
+      if (!user) {
+        throw new AppError('Usuario nao encontrado', 404);
+      }
+
+      await User.deleteOne({_id: user_id});
+
+      return res.json({message: 'Usuário deletado com sucesso'})
+  }
+  catch (error) {
+          if (error instanceof AppError){
+        return res.status(error.statusCode).json({
+          error: error.message,
+          status: error.status,
+      });
+      }
+      console.error('Erro inesperado:', error);
+      const internalError = new InternalServerError();
+      return res.status(internalError.statusCode).json({
+        error: internalError.message,
+        status: internalError.status,
+      });
+    }
+  }
+
 
 }
 
