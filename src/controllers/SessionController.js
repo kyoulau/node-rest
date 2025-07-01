@@ -4,6 +4,7 @@ import ConflictError from '../errors/ConflictError';
 import InternalServerError from '../errors/InternalServerError';
 import AppError from '../errors/AppError';
 import { generateHash } from '../lib/hash';
+import * as Yup from 'yup';
 
 class SessionController{
 
@@ -11,6 +12,13 @@ class SessionController{
 
   //store: Cria sessão
   async store(req, res){
+
+    const schema = Yup.object().shape({
+      email: Yup.string().email().required(),
+      password: Yup.string().required(),
+      name: Yup.string().required(),
+    });
+
     const { email, password, name }= req.body;
 
     if (!name || !email || !password) {
@@ -18,6 +26,11 @@ class SessionController{
     }
 
     try {
+
+      if (!(await schema.isValid(req.body))) {
+        throw new BadRequestError('Dados inválidos');
+      }
+
       const existingUser = await User.findOne({ email });
 
       if (existingUser) {
@@ -26,10 +39,10 @@ class SessionController{
 
       const hashedPassword = await generateHash(password);
 
-      const newUser = await User.create({ 
-        email, 
-        password: hashedPassword, 
-        name 
+      const newUser = await User.create({
+        email,
+        password: hashedPassword,
+        name
       });
 
       const userResponse = {
@@ -61,9 +74,9 @@ class SessionController{
   async showById(req, res){
     try {
       const {user_id} = req.params;
-      
+
       const userForFind = await User.findById(user_id);
-      
+
       return res.json(userForFind);
     } catch (error) {
       console.error('Erro inesperado:', error);
