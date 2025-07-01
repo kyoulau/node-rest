@@ -5,6 +5,7 @@ import HouseController from "./controllers/HouseController";
 import multer from "multer";
 import uploadConfig from "./config/upload";
 import DashboardController from "./controllers/DashboardController";
+import ReservationController from "./controllers/ReservationController";
 
 const routes = new Router();
 const upload = multer(uploadConfig);
@@ -24,5 +25,9 @@ routes.get('/houses/:house_id', HouseController.showById);
 routes.delete('/houses/:house_id', HouseController.destroyById);
 
 routes.get('/dashboard', DashboardController.index);
+
+routes.post('/houses/:house_id/reserve', ReservationController.store)
+routes.delete('/houses/:house_id/reserve', ReservationController.destroy);
+routes.get('/houses/:house_id/reserve', ReservationController.index);
 
 export default routes;
