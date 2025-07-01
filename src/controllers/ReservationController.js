@@ -2,6 +2,7 @@ import InternalServerError from '../errors/InternalServerError';
 import AppError from '../errors/AppError';
 import House from '../models/House';
 import Reservation from '../models/Reservation';
+import * as Yup from 'yup';
 
 class ReservationController {
 
@@ -31,7 +32,15 @@ class ReservationController {
   }
 
   async store(req, res) {
+    const schema = Yup.object().shape({
+      date: Yup.date().required(),
+    })
     try {
+
+      if (!(await schema.isValid(req.body))) {
+        throw new BadRequestError('Dados inválidos');
+      }
+
       const { house_id } = req.params;
       const { user_id } = req.headers;
       const { date } = req.body;
