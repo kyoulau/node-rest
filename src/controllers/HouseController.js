@@ -6,6 +6,7 @@ import AppError from '../errors/AppError';
 import { generateHash } from '../lib/hash';
 import House from '../models/House';
 import User from '../models/User';
+import * as Yup from 'yup';
 
 class HouseController{
 
